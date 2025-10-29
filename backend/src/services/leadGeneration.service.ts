@@ -217,7 +217,7 @@ export class LeadGenerationService {
   }
 
   private async calculateFitScore(lead: Lead): Promise<number> {
-    // AI-powered lead scoring using Claude
+    // AI-powered lead scoring using Google AI (Gemini Pro)
     const prompt = `
     Evaluate this lead for our AI automated ad company:
     
@@ -235,28 +235,24 @@ export class LeadGenerationService {
     Return only a number between 0 and 1.
     `;
 
-    // Call Claude API for scoring
-    const score = await this.callClaude(prompt);
+    // Call Google AI for scoring
+    const score = await this.callGoogleAI(prompt);
     return parseFloat(score);
   }
 
-  private async callClaude(prompt: string): Promise<string> {
+  private async callGoogleAI(prompt: string): Promise<string> {
     try {
-      const response = await axios.post('https://api.anthropic.com/v1/messages', {
-        model: 'claude-3-sonnet-20240229',
-        max_tokens: 100,
-        messages: [{ role: 'user', content: prompt }]
-      }, {
-        headers: {
-          'Authorization': `Bearer ${process.env.ANTHROPIC_API_KEY}`,
-          'Content-Type': 'application/json',
-          'x-api-key': process.env.ANTHROPIC_API_KEY
-        }
-      });
-
-      return response.data.content[0].text || '0.5';
+      const { GoogleGenerativeAI } = require('@google/generative-ai');
+      const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
+      const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+      
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      const text = response.text();
+      
+      return text.trim() || '0.5';
     } catch (error) {
-      console.error('Claude API error:', error);
+      console.error('Google AI error:', error);
       return '0.5'; // Default score
     }
   }

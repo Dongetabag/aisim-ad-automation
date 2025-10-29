@@ -151,7 +151,7 @@ const htmlContent = `<!DOCTYPE html>
         <div class="features">
             <div class="feature">
                 <h3>🤖 AI Ad Generation</h3>
-                <p>Automated ad creation using advanced AI models with Claude integration for high-quality, targeted advertisements.</p>
+                <p>Automated ad creation using Google AI (Gemini Pro) for high-quality, targeted advertisements with advanced copywriting.</p>
             </div>
             <div class="feature">
                 <h3>📊 Lead Generation</h3>
@@ -191,7 +191,7 @@ const htmlContent = `<!DOCTYPE html>
     <script>
         function showFeature(feature) {
             const messages = {
-                'ai': '🤖 AI Ad Generation: Create high-quality ads using Claude AI integration',
+                'ai': '🤖 AI Ad Generation: Create high-quality ads using Google AI (Gemini Pro)',
                 'leads': '📊 Lead Generation: Generate targeted leads using Google Places API',
                 'analytics': '📈 Analytics: Track performance with real-time metrics and ROI analysis',
                 'extension': '🔧 Chrome Extension: Deploy ads with automated placement and tracking'
