@@ -52,7 +52,7 @@ export class AdCreationService {
    * Generate complete popup ad from intake form
    */
   async generateAd(formData: IntakeFormData, packageType: string): Promise<GeneratedAd> {
-    // Step 1: Generate ad copy using Claude
+    // Step 1: Generate ad copy using Google AI (Gemini)
     const adCopy = await this.generateAdCopy(formData);
     
     // Step 2: Generate HTML/CSS/JS structure

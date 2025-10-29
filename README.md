@@ -28,7 +28,7 @@ node test-google-api.js
 
 AISim is a comprehensive automated ad generation platform that combines:
 
-- **AI-Powered Ad Creation** using Claude 3.5 Sonnet
+- **AI-Powered Ad Creation** using Google AI (Gemini Pro)
 - **Lead Generation** with Brave Search API + Google Places integration
 - **Google Services Integration** for enhanced lead discovery and ad inspiration
 - **Automated Prospecting** with personalized outreach
