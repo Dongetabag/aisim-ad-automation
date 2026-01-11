@@ -6,21 +6,69 @@ import { IntakeController } from './controllers/intake.controller';
 import { PaymentController } from './controllers/payment.controller';
 import { AdController } from './controllers/ad.controller';
 import { pool } from './config/database.config';
+import { validateEnvironment } from './config/env.config';
+import {
+  apiLimiter,
+  strictLimiter,
+  paymentLimiter,
+  sanitizeInput,
+  errorHandler,
+  notFoundHandler,
+  requestLogger,
+} from './middleware/security.middleware';
 
 // Load environment variables
 dotenv.config();
 
-const app = express();
-const PORT = process.env.PORT || 3000;
+// Validate environment variables at startup
+let config;
+try {
+  config = validateEnvironment();
+} catch (error) {
+  console.error('❌ Environment validation failed:');
+  console.error((error as Error).message);
+  process.exit(1);
+}
 
-// Middleware
-app.use(helmet());
+const app = express();
+const PORT = config.PORT;
+
+// Security middleware
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrc: ["'self'"],
+      imgSrc: ["'self'", 'data:', 'https:'],
+    },
+  },
+  hsts: {
+    maxAge: 31536000,
+    includeSubDomains: true,
+    preload: true,
+  },
+}));
+
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:3001',
   credentials: true
 }));
+
+// Body parsing with size limits
 app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Request logging
+if (process.env.NODE_ENV !== 'test') {
+  app.use(requestLogger);
+}
+
+// Input sanitization
+app.use(sanitizeInput);
+
+// Rate limiting
+app.use('/api', apiLimiter);
 
 // Initialize controllers
 const intakeController = new IntakeController();
@@ -37,21 +85,24 @@ app.get('/health', (req, res) => {
 });
 
 // API Routes
-app.post('/api/intake/submit', (req, res) => intakeController.submitIntakeForm(req, res));
+// Intake routes with strict rate limiting for expensive operations
+app.post('/api/intake/submit', strictLimiter, (req, res) => intakeController.submitIntakeForm(req, res));
 app.get('/api/intake/packages', (req, res) => intakeController.getPackages(req, res));
-app.post('/api/intake/payment-intent', (req, res) => intakeController.createPaymentIntent(req, res));
-app.post('/api/intake/generate-ad', (req, res) => intakeController.generateFinalAd(req, res));
-app.post('/api/intake/google-leads', (req, res) => intakeController.generateGoogleLeads(req, res));
+app.post('/api/intake/payment-intent', paymentLimiter, (req, res) => intakeController.createPaymentIntent(req, res));
+app.post('/api/intake/generate-ad', strictLimiter, (req, res) => intakeController.generateFinalAd(req, res));
+app.post('/api/intake/google-leads', strictLimiter, (req, res) => intakeController.generateGoogleLeads(req, res));
 app.post('/api/intake/ad-inspiration', (req, res) => intakeController.getAdInspiration(req, res));
 app.get('/api/intake/validate-google', (req, res) => intakeController.validateGoogleApi(req, res));
 
+// Payment routes with strict rate limiting
 app.post('/api/payment/webhook', (req, res) => paymentController.handleWebhook(req, res));
 app.get('/api/payment/status/:paymentIntentId', (req, res) => paymentController.getPaymentStatus(req, res));
-app.post('/api/payment/customer', (req, res) => paymentController.createCustomer(req, res));
-app.post('/api/payment/subscription', (req, res) => paymentController.createSubscription(req, res));
+app.post('/api/payment/customer', paymentLimiter, (req, res) => paymentController.createCustomer(req, res));
+app.post('/api/payment/subscription', paymentLimiter, (req, res) => paymentController.createSubscription(req, res));
 app.get('/api/payment/orders/:customerEmail', (req, res) => paymentController.getCustomerOrders(req, res));
 app.get('/api/payment/download/:adId', (req, res) => paymentController.downloadAdPackage(req, res));
 
+// Ad routes
 app.get('/api/ads/:adId', (req, res) => adController.getAd(req, res));
 app.get('/api/ads/:adId/performance', (req, res) => adController.getAdPerformance(req, res));
 app.post('/api/ads/:adId/deploy', (req, res) => adController.deployAd(req, res));
@@ -100,22 +151,11 @@ app.get('/api/embed/:adId', async (req, res) => {
   }
 });
 
-// Error handling middleware
-app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error('Unhandled error:', err);
-  res.status(500).json({
-    success: false,
-    error: 'Internal server error'
-  });
-});
+// Error handling middleware (must be after all routes)
+app.use(errorHandler);
 
-// 404 handler
-app.use('*', (req, res) => {
-  res.status(404).json({
-    success: false,
-    error: 'Endpoint not found'
-  });
-});
+// 404 handler (must be last)
+app.use(notFoundHandler);
 
 // Initialize database tables
 async function initializeDatabase() {
