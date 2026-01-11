@@ -99,7 +99,7 @@ export function validateEnvironment(): EnvironmentConfig {
   console.log(`📊 Environment: ${config.NODE_ENV}`);
   console.log(`🔗 Backend URL: ${config.BACKEND_URL}`);
   console.log(`🔗 Frontend URL: ${config.FRONTEND_URL}`);
-  console.log(`🔑 Google API Key: ${googleKey.substring(0, 10)}...`);
+  console.log(`🔑 Google API Key: configured`);
   console.log(`🔑 Stripe Mode: ${stripeKey.startsWith('sk_live_') ? 'LIVE' : 'TEST'}`);
 
   if (!config.BRAVE_API_KEY) {

@@ -90,8 +90,13 @@ function sanitizeObject(obj: any): any {
     // Check for dangerous patterns
     for (const pattern of dangerousPatterns) {
       if (pattern.test(obj)) {
-        // Return empty string or throw error based on your security policy
-        // For production, you might want to throw an error instead
+        // Log security event for monitoring
+        console.warn('⚠️  Security: Dangerous input detected and removed', {
+          pattern: pattern.toString(),
+          timestamp: new Date().toISOString(),
+        });
+        // Return empty string to remove dangerous content
+        // Alternative: throw new Error('Invalid input detected') to reject request
         return '';
       }
     }
@@ -106,7 +111,7 @@ function sanitizeObject(obj: any): any {
   if (obj && typeof obj === 'object') {
     const sanitized: any = {};
     for (const key in obj) {
-      if (obj.hasOwnProperty(key)) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
         sanitized[key] = sanitizeObject(obj[key]);
       }
     }
