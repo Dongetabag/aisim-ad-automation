@@ -117,7 +117,8 @@ ANTHROPIC_API_KEY=sk-ant-...
 BRAVE_API_KEY=BSA...
 
 # Google Services (Get from https://console.cloud.google.com)
-GOOGLE_API_KEY=AIzaSyAUdihaqNym1hM9XqP4M-zi5WacdCGoBpU
+# IMPORTANT: Never commit real API keys to source control!
+GOOGLE_API_KEY=your_google_api_key_here
 
 # Application
 JWT_SECRET=your_jwt_secret_here
