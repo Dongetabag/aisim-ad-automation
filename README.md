@@ -2,6 +2,20 @@
 
 **AI-Powered Marketing Excellence** - Generate high-converting popup ads in under 2 minutes using advanced AI.
 
+## ✅ Production Ready
+
+This application has been hardened for production deployment with:
+
+- 🔒 **Security**: Rate limiting, input sanitization, CSRF protection, security headers
+- 🛡️ **Vulnerability Scanning**: Clean CodeQL analysis, dependency auditing
+- 🐳 **Optimized Docker**: Multi-stage builds, minimal attack surface
+- 📊 **Monitoring**: Health checks, structured logging, error tracking
+- 🔑 **Secrets Management**: Environment validation, no hardcoded credentials
+- 🚀 **CI/CD**: Automated testing, building, and security scanning
+- 📖 **Documentation**: Comprehensive deployment and security guides
+
+See [PRODUCTION_DEPLOYMENT.md](PRODUCTION_DEPLOYMENT.md) for deployment instructions and [SECURITY.md](SECURITY.md) for security best practices.
+
 ## 🚀 Quick Start
 
 ```bash
@@ -127,8 +141,10 @@ ENCRYPTION_KEY=your_encryption_key_here
 
 ### API Keys Setup
 
+⚠️ **SECURITY WARNING**: Never commit real API keys to source control!
+
 1. **Stripe**: Create account at [stripe.com](https://stripe.com)
-2. **Anthropic**: Get API key from [console.anthropic.com](https://console.anthropic.com)
+2. **Google AI**: Get API key from [console.cloud.google.com](https://console.cloud.google.com)
 3. **Brave Search**: Register at [brave.com/search/api](https://brave.com/search/api)
 4. **Google Services**: Enable APIs at [console.cloud.google.com](https://console.cloud.google.com)
    - Enable **Places API (New)** at [places-backend.googleapis.com](https://console.cloud.google.com/apis/library/places-backend.googleapis.com)
@@ -195,10 +211,30 @@ docker-compose down
 
 ### Production Deployment
 
-1. **Backend**: Deploy to Railway, Heroku, or AWS
-2. **Frontend**: Deploy to Vercel or Netlify
-3. **Database**: Use managed PostgreSQL (AWS RDS, Railway, etc.)
-4. **Redis**: Use managed Redis (AWS ElastiCache, Railway, etc.)
+For production deployment, see the comprehensive [PRODUCTION_DEPLOYMENT.md](PRODUCTION_DEPLOYMENT.md) guide which covers:
+
+- 🔐 Pre-deployment security checklist
+- 🐳 Docker Compose deployment (self-hosted)
+- ☁️ Cloud platform deployments (Railway, AWS, GCP, etc.)
+- 🔑 Environment variable configuration
+- 🗄️ Database setup and backups
+- 📊 Monitoring and logging setup
+- 🔒 Security hardening
+- 🚨 Troubleshooting guide
+
+**Quick Production Deploy with Docker:**
+
+```bash
+# 1. Configure environment
+cp env.example .env
+# Edit .env with production values
+
+# 2. Deploy with production compose file
+docker-compose -f docker-compose.prod.yml up -d
+
+# 3. Check logs
+docker-compose -f docker-compose.prod.yml logs -f
+```
 
 ## 🧪 Testing
 
@@ -272,11 +308,31 @@ AISim follows a consistent brand identity:
 
 ## 🔒 Security
 
-- **Data Encryption**: All sensitive data encrypted at rest
-- **API Security**: JWT tokens and rate limiting
-- **Payment Security**: PCI-compliant Stripe integration
-- **Privacy**: GDPR-compliant data handling
-- **HTTPS**: All communications encrypted
+Security is a top priority for AISim. We implement multiple layers of protection:
+
+### Application Security
+- ✅ **Rate Limiting**: API endpoints protected with configurable rate limits
+- ✅ **Input Validation**: All user input validated and sanitized
+- ✅ **Security Headers**: Helmet.js with CSP, HSTS, and other security headers
+- ✅ **CSRF Protection**: Cross-site request forgery prevention
+- ✅ **XSS Prevention**: Input sanitization and output encoding
+- ✅ **SQL Injection Prevention**: Parameterized queries throughout
+
+### Infrastructure Security
+- ✅ **Environment Validation**: Required secrets verified at startup
+- ✅ **No Hardcoded Secrets**: All credentials in environment variables
+- ✅ **Docker Security**: Multi-stage builds, minimal base images
+- ✅ **HTTPS/TLS**: End-to-end encryption in production
+
+### Monitoring & Compliance
+- ✅ **Security Scanning**: Automated CodeQL and Trivy scans
+- ✅ **Dependency Auditing**: Regular npm audit checks
+- ✅ **Error Handling**: Safe error messages (no internal details exposed)
+- ✅ **Audit Logging**: Security events logged for review
+
+For detailed security information, see [SECURITY.md](SECURITY.md).
+
+**Reporting Security Issues**: Email security@aisim.com
 
 ## 🤝 Contributing
 

@@ -54,6 +54,9 @@ export const paymentLimiter = rateLimit({
 /**
  * Request sanitization middleware
  * Prevents common injection attacks
+ * 
+ * Note: This provides basic protection. For HTML content, validation should be done
+ * at the controller level using proper HTML sanitization libraries like DOMPurify.
  */
 export function sanitizeInput(req: Request, res: Response, next: NextFunction) {
   // Sanitize request body
@@ -70,16 +73,30 @@ export function sanitizeInput(req: Request, res: Response, next: NextFunction) {
 }
 
 /**
- * Recursively sanitize an object by removing potential XSS and injection attempts
+ * Recursively sanitize an object by detecting and rejecting potentially dangerous content
+ * For production use, consider using a library like validator.js or DOMPurify
  */
 function sanitizeObject(obj: any): any {
   if (typeof obj === 'string') {
-    // Remove potential XSS attempts
-    return obj
-      .replace(/<script[^>]*>.*?<\/script>/gi, '')
-      .replace(/javascript:/gi, '')
-      .replace(/on\w+\s*=/gi, '')
-      .trim();
+    // Detect potentially dangerous patterns
+    const dangerousPatterns = [
+      /<script/i,          // Script tags
+      /javascript:/i,      // JavaScript protocol
+      /vbscript:/i,        // VBScript protocol
+      /data:text\/html/i,  // Data URLs with HTML
+      /on\w+\s*=/i,        // Event handlers
+    ];
+    
+    // Check for dangerous patterns
+    for (const pattern of dangerousPatterns) {
+      if (pattern.test(obj)) {
+        // Return empty string or throw error based on your security policy
+        // For production, you might want to throw an error instead
+        return '';
+      }
+    }
+    
+    return obj.trim();
   }
 
   if (Array.isArray(obj)) {
