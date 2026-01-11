@@ -1,7 +1,9 @@
 // Test Google API Integration
 const axios = require('axios');
 
-const GOOGLE_API_KEY = 'AIzaSyAUdihaqNym1hM9XqP4M-zi5WacdCGoBpU';
+// SECURITY WARNING: Never hardcode API keys in source files!
+// Use environment variables instead: process.env.GOOGLE_API_KEY
+const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY || 'YOUR_API_KEY_HERE';
 
 async function testGoogleAPI() {
   console.log('🧪 Testing Google API Integration...\n');

@@ -39,20 +39,20 @@ export class AdCreationService {
 
 ## 🔑 Your Google API Key
 
-**Already in env.example**: `AIzaSyAUdihaqNym1hM9XqP4M-zi5WacdCGoBpU`
+**SECURITY WARNING**: Never commit real API keys to source control!
 
 ### How to Use:
 
 1. **Local Development**:
    ```bash
-   cd /Users/simeonreid/AISim\ Automated\ Ad\ System/aisim-ad-automation
+   cd /path/to/aisim-ad-automation
    cp env.example .env
-   # The GOOGLE_API_KEY is already set in env.example
+   # Edit .env and add your actual GOOGLE_API_KEY
    ```
 
 2. **Backend Deployment** (Railway/Cloud Run):
    - Add environment variable: `GOOGLE_API_KEY`
-   - Value: `AIzaSyAUdihaqNym1hM9XqP4M-zi5WacdCGoBpU`
+   - Value: `your_actual_google_api_key_here`
 
 3. **Vercel** (if using on frontend):
    - Usually not needed - API calls go through backend
@@ -122,10 +122,11 @@ Output format: JSON
 ### Backend (.env file needed)
 ```bash
 # Google AI - REQUIRED for ad generation
-GOOGLE_API_KEY=AIzaSyAUdihaqNym1hM9XqP4M-zi5WacdCGoBpU
+# Get your key from: https://console.cloud.google.com
+GOOGLE_API_KEY=your_google_api_key_here
 
-# Google Places - For lead generation
-GOOGLE_PLACES_API_KEY=AIzaSyAUdihaqNym1hM9XqP4M-zi5WacdCGoBpU
+# Google Places - For lead generation (can use same key as above)
+GOOGLE_PLACES_API_KEY=your_google_api_key_here
 
 # Brave Search - For competitive research
 BRAVE_API_KEY=your_brave_api_key
@@ -228,7 +229,7 @@ railway up
 # For Google Cloud Run:
 gcloud run deploy aisim-backend \
   --source . \
-  --set-env-vars GOOGLE_API_KEY=AIzaSyAUdihaqNym1hM9XqP4M-zi5WacdCGoBpU
+  --set-env-vars GOOGLE_API_KEY=your_google_api_key_here
 ```
 
 ### 2. Test Ad Generation
@@ -249,14 +250,17 @@ curl https://your-backend-url.com/api/ads/generate \
 
 ## 🔐 API Key Security
 
-Your Google API Key: `AIzaSyAUdihaqNym1hM9XqP4M-zi5WacdCGoBpU`
+**CRITICAL**: Never commit your actual API keys to source control!
 
 ### Security Best Practices:
 ✅ Store in environment variables (not in code)  
 ✅ Use in backend only (never expose to frontend)  
+✅ Add API keys to .gitignore (via .env files)  
+✅ Use different keys for development and production  
 ✅ Monitor usage in Google Cloud Console  
-✅ Set up API restrictions if needed  
+✅ Set up API restrictions and quotas  
 ✅ Rotate keys periodically  
+✅ Use secret management services in production (AWS Secrets Manager, Google Secret Manager, etc.)  
 
 ### API Restrictions (Optional but Recommended):
 1. Go to Google Cloud Console

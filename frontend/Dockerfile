@@ -1,3 +1,21 @@
+FROM node:18-alpine AS builder
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install ALL dependencies (including devDependencies for build)
+RUN npm install
+
+# Copy source code
+COPY . .
+
+# Build the application
+RUN npm run build
+
+# Production stage
 FROM node:18-alpine
 
 # Set working directory
@@ -6,14 +24,13 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies and curl for health checks
-RUN npm ci --only=production && apk add --no-cache curl
+# Install only production dependencies
+RUN npm install --omit=dev && apk add --no-cache curl
 
-# Copy source code
-COPY . .
-
-# Build the application
-RUN npm run build
+# Copy built files from builder stage
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/next.config.js ./next.config.js
 
 # Expose port
 EXPOSE 3000
